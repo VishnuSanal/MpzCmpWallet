@@ -35,6 +35,7 @@ import mpzcmpwallet.composeapp.generated.resources.compose_multiplatform
 import org.jetbrains.compose.resources.painterResource
 import org.multipaz.asn1.ASN1Integer
 import org.multipaz.cbor.Simple
+import org.multipaz.compose.permissions.rememberBluetoothEnabledState
 import org.multipaz.compose.permissions.rememberBluetoothPermissionState
 import org.multipaz.compose.presentment.Presentment
 import org.multipaz.compose.prompt.PromptDialogs
@@ -227,6 +228,7 @@ class App() {
         MaterialTheme {
             val coroutineScope = rememberCoroutineScope { promptModel }
             val blePermissionState = rememberBluetoothPermissionState()
+            val bleEnabledState = rememberBluetoothEnabledState()
 
             PromptDialogs(promptModel)
 
@@ -244,6 +246,22 @@ class App() {
                         }
                     ) {
                         Text("Request BLE permissions")
+                    }
+                }
+            } else if (!bleEnabledState.isEnabled) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                bleEnabledState.enable()
+                            }
+                        }
+                    ) {
+                        Text("Enable Bluetooth")
                     }
                 }
             } else {
